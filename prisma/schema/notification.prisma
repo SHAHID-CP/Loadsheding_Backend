@@ -1,0 +1,20 @@
+model Notification {
+  id        String              @id @default(uuid())
+  channel   NotificationChannel @default(IN_APP)
+  title     String
+  body      String
+  refType   String?
+  refId     String?
+  readAt    DateTime?
+  userId    String
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, readAt])
+  @@index([createdAt])
+  // Reminder jobs dedupe on (refType, refId); without this they scan the table.
+  @@index([refType, refId])
+  @@map("notifications")
+}

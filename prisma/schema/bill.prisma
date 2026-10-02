@@ -1,0 +1,20 @@
+model Bill {
+  id         String     @id @default(uuid())
+  period     String
+  unitsUsed  Decimal    @db.Decimal(10, 2)
+  amount     Decimal    @db.Decimal(10, 2)
+  dueDate    DateTime
+  status     BillStatus @default(UNPAID)
+  customerId String
+  deletedAt  DateTime?
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+
+  customer CustomerProfile @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  payments Payment[]
+
+  @@unique([customerId, period])
+  @@index([status, dueDate])
+  @@index([deletedAt])
+  @@map("bills")
+}

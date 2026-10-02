@@ -1,0 +1,21 @@
+model Area {
+  id        String    @id @default(uuid())
+  name      String
+  code      String    @unique
+  lat       Float?
+  lng       Float?
+  feederId  String
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  feeder    Feeder             @relation(fields: [feederId], references: [id], onDelete: Restrict)
+  customers CustomerProfile[]
+  schedules LoadShedSchedule[]
+  outages   Outage[]
+  reports   OutageReport[]
+
+  @@index([feederId, deletedAt])
+  @@index([name])
+  @@map("areas")
+}

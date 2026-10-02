@@ -1,0 +1,26 @@
+model User {
+  id                 String       @id @default(uuid())
+  email              String       @unique
+  password           String?
+  googleId           String?      @unique
+  authProvider       AuthProvider @default(CREDENTIAL)
+  emailVerified      Boolean      @default(false)
+  role               Role         @default(CUSTOMER)
+  status             UserStatus   @default(ACTIVE)
+  needPasswordChange Boolean      @default(false)
+  isDeleted          Boolean      @default(false)
+  deletedAt          DateTime?
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @updatedAt
+
+  customerProfile    CustomerProfile?
+  reports            OutageReport[]
+  assignments        Assignment[]
+  notifications      Notification[]
+  payments           Payment[]
+  auditLogs          AuditLog[]
+
+  @@index([role, status])
+  @@index([deletedAt])
+  @@map("users")
+}

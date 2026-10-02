@@ -1,0 +1,23 @@
+model OutageReport {
+  id          String       @id @default(uuid())
+  description String
+  imageUrl    String?
+  status      ReportStatus @default(REPORTED)
+  customerId  String
+  areaId      String
+  outageId    String?
+  deletedAt   DateTime?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  customer  User    @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  area      Area    @relation(fields: [areaId], references: [id], onDelete: Restrict)
+  outage    Outage? @relation("OutageReports", fields: [outageId], references: [id], onDelete: SetNull)
+  primaryOf Outage? @relation("OutagePrimaryReport")
+
+  @@index([customerId, status])
+  @@index([areaId, status])
+  @@index([outageId])
+  @@index([deletedAt])
+  @@map("outage_reports")
+}

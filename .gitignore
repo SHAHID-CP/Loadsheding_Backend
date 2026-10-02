@@ -1,0 +1,18 @@
+node_modules
+dist
+generated
+.env
+.env.*
+!.env.example
+
+/src/generated
+/generated/prisma
+vercel.json
+.vercel
+
+# Lock Files
+pnpm-lock.yaml
+yarn.lock
+package-lock.json
+pnpm-workspace.yaml
+.vscode

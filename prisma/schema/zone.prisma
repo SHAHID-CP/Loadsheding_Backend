@@ -1,0 +1,13 @@
+model Zone {
+  id        String    @id @default(uuid())
+  name      String
+  code      String    @unique
+  deletedAt DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  substations Substation[]
+
+  @@index([deletedAt])
+  @@map("zones")
+}

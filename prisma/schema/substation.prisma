@@ -1,0 +1,16 @@
+model Substation {
+  id         String    @id @default(uuid())
+  name       String
+  code       String    @unique
+  capacityMw Decimal   @db.Decimal(10, 2)
+  zoneId     String
+  deletedAt  DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  zone    Zone     @relation(fields: [zoneId], references: [id], onDelete: Restrict)
+  feeders Feeder[]
+
+  @@index([zoneId, deletedAt])
+  @@map("substations")
+}

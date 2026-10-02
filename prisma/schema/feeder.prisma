@@ -1,0 +1,19 @@
+model Feeder {
+  id           String    @id @default(uuid())
+  name         String
+  code         String    @unique
+  loadMw       Decimal   @db.Decimal(10, 2)
+  priority     Priority  @default(NORMAL)
+  substationId String
+  deletedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  substation Substation         @relation(fields: [substationId], references: [id], onDelete: Restrict)
+  areas      Area[]
+  schedules  LoadShedSchedule[]
+
+  @@index([substationId, deletedAt])
+  @@index([priority])
+  @@map("feeders")
+}
