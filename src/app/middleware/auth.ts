@@ -13,7 +13,7 @@ declare global {
         interface Request {
             user?: {
                 email: string;
-                name: string;
+                name?: string;
                 id: string;
                 role: Role;
             }
@@ -41,7 +41,7 @@ export const auth = (...requiredRoles : Role[]) => {
 
         if(requiredRoles.length && !requiredRoles.includes(role)) throw new AppError(StatusCodes.UNAUTHORIZED, "Forbidden. You don't have permission to access this resource.");
         const user = await prisma.user.findUnique({
-            where: {id,email, name, role
+            where: {email
             }
         });
 

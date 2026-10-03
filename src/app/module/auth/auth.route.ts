@@ -1,67 +1,37 @@
 import { Router } from "express";
-import { Role } from "../../../generated/prisma/enums";
+import { Role } from "../../../../generated/prisma/enums";
 import { auth } from "../../middleware/auth";
-import { validateRequest } from "../../middleware/validate";
-import { AuthController } from "./auth.controller";
-import { UserValidation } from "./auth.validation";
+import { validate } from "../../middleware/validate";
+import { authController } from "./auth.controller";
+import { ChangedPasswordSchema, ForgotPasswordSchema, loginSchema, registerSchema, ResetPasswordSchema, userEmailVerifySchema } from "./auth.validation";
 
-const router = Router();
 
-router.post(
-	"/register",
-	// (req : Request, res : Response, next : NextFunction) => {
 
-	// 	try {
-	// 		// const payload = req.body ? req.body : {}
-	// 		const payload = req.body ?? {}
+const router =Router();
 
-	// 		const result = PatientValidation.PatientRegistrationZodSchema.safeParse(payload);
+router.post("/register", validate(registerSchema), authController.register);
+router.post("/login", validate(loginSchema), authController.login);
 
-	// 		if (!result.success) {
-	// 			console.log(result.error);
-	// 			console.log(result.error.issues);
+router.post('/verify-email', validate(userEmailVerifySchema),authController.verifyUserEmail);
+router.post('/google-login', authController.googleLogin);
 
-	// 			throw new Error(result.error.issues[0].message)
-	// 		}
 
-	// 		req.body = result.data
+router.post("/refresh-token", authController.refreshToken);
+router.post("/logout", authController.logout);
 
-	// 		next()
-	// 	} catch (error) {
+router.post("/forgot-password",validate(ForgotPasswordSchema) ,authController.forgotPassword);
+router.post("/reset-password",validate(ResetPasswordSchema) ,authController.resetPassword);
+router.post("/change-password",validate(ChangedPasswordSchema),auth(Role.CUSTOMER,Role.TECHNICIAN) ,authController.changedPassword);
 
-	// 		next(error)
-	// 	}
-	// },
+// router.get("/me",
+// auth(Role.ADMIN, Role.LANDLORD, Role.TENANT),
+// authController.getMyProfile)
+// router.patch(
+//   "/me",validate(updateProfileSchema),
+//   auth(Role.ADMIN, Role.LANDLORD, Role.TENANT),
+//   authController.updateMyProfile
+// );
 
-	validateRequest(UserValidation.PatientRegistrationZodSchema),
-	AuthController.registerPatient,
-);
-router.post(
-	"/verify-email",
-	validateRequest(UserValidation.PatientEmailVerifyZodSchema),
-	AuthController.verifyPatientEmail,
-);
-router.post(
-	"/login",
-	validateRequest(UserValidation.LoginZodSchema),
-	AuthController.loginUser,
-);
-router.get(
-	"/me",
-	auth(Role.ADMIN, Role.DOCTOR, Role.PATIENT, Role.SUPER_ADMIN),
-	// validateRequest
-	AuthController.getMe,
-);
-router.post("/refresh-token", AuthController.refreshToken);
-router.post("/google", AuthController.googleLogin);
-router.post(
-	"/forgot-password",
-	validateRequest(UserValidation.ForgotPasswordZodSchema),
-	AuthController.forgotPassword,
-);
-router.post(
-	"/reset-password",
-	validateRequest(UserValidation.ResetPasswordZodSchema),
-	AuthController.resetPassword,
-);
-export const AuthRoutes = router;
+export const authRoutes=router;
+
+

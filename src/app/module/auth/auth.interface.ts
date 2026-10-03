@@ -1,18 +1,23 @@
-import type { Role } from "../../../generated/prisma/browser";
+import { Role, type Priority } from "../../../../generated/prisma/enums";
 
-export interface ILoginUserPayload {
+
+export interface RegisterInput {
+  email: string;
+  password: string;
+  name: string;
+  phone: string;
+  address: string;
+  meterNo: string;
+  priority?: Priority;
+  areaId?: string;
+}
+
+export interface LoginInput {
 	email: string;
 	password: string;
 }
 
-export interface IRegisterPatientPayload {
-	name: string;
-	email: string;
-	password: string;
-	patient: {
-		contactNumber?: string;
-	};
-}
+
 export interface IVerifyEmailPayload {
 	email: string;
 	otp: string;
@@ -36,4 +41,9 @@ export interface IResetPasswordPayload {
 	email: string;
 	newPassword: string;
 	otp: string;
+}
+export interface IChangedPasswordPayload {
+	oldPassword: string;
+	newPassword: string;
+	email:string
 }
