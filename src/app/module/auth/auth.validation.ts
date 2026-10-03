@@ -7,7 +7,6 @@ export const registerSchema = z.object({
   password: z.string().min(8, "Password must be at least 8 characters"), 
   phone: z.string().min(6, 'A valid phone number is required'),
   address: z.string().min(5, 'Address must be at least 5 characters'),
-  meterNo: z.string().min(3, 'Meter number is required'),
   priority: z.nativeEnum(Priority).optional(),
   areaId: z.string().uuid('areaId must be a valid uuid').optional(),
 });

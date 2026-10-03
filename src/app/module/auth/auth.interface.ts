@@ -7,7 +7,7 @@ export interface RegisterInput {
   name: string;
   phone: string;
   address: string;
-  meterNo: string;
+  meterNo?: string;
   priority?: Priority;
   areaId?: string;
 }

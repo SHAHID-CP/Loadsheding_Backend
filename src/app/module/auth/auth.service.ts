@@ -24,7 +24,7 @@ const issueTokenPair = async (payload : JwtPayload) => {
 
 
 const registerUser=async(payload:RegisterInput)=>{
-    const { name, email, password,phone,address,meterNo } = payload;
+    const { name, email, password,phone,address} = payload;
     const isUserExist = await prisma.user.findUnique({
         where: { email }
     })
@@ -32,6 +32,7 @@ const registerUser=async(payload:RegisterInput)=>{
     if (isUserExist) {
         throw new AppError(StatusCodes.NOT_FOUND,"User with this email already exists");
     }
+
     const hashedPassword = await bcrypt.hash(password, Number(config.bcrypt_salt_rounds))
 
 
@@ -53,8 +54,7 @@ const registerUser=async(payload:RegisterInput)=>{
         customerProfile: {
         name,
         phone,
-        address,
-        meterNo,
+        address
       },
 	};
 
@@ -145,7 +145,7 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
 				name:userPayload.customerProfile.name,
                 phone:userPayload.customerProfile.phone,
                 address:userPayload.customerProfile.address,
-                meterNo:userPayload.customerProfile.meterNo
+                meterNo:""
 				},
 			},
 		},
@@ -179,7 +179,7 @@ const verifyUserEmail = async (payload: IVerifyEmailPayload) => {
     return { user, ...tokens };
 };
 
-export const loginUser = async (payload: LoginInput) => {
+const loginUser = async (payload: LoginInput) => {
 
   const { email, password } = payload;
 

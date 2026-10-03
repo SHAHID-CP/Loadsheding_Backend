@@ -1,37 +1,12 @@
 import type { UploadApiResponse } from "cloudinary";
+import { StatusCodes } from "http-status-codes";
+import { Role } from "../../../../generated/prisma/enums";
 import { cloudinary } from "../../lib/cloudinary";
 import { prisma } from "../../lib/prisma";
+import { AppError } from "../../utils/sendResponse";
+import type { IUpdateMeterPayload, IUserUpdate } from "./user.interface";
 
 const uploadProfileImage = async (buffer: Buffer, userId: string) => {
-	// const cloudinaryResult = cloudinary.uploader.upload_stream(
-	//     {
-	//         resource_type : "auto"
-	//     },
-
-	//     async (error, result) => {
-	//         if(error){
-	//             console.log(error);
-	//             throw new Error(error.message)
-	//         }
-
-	//         console.log(result, "result");
-
-	//         const updatedUser = await prisma.user.update({
-	//             where : {
-	//                 id : userId
-	//             },
-
-	//             data: {
-	//                 imageUrl : result?.secure_url,
-	//                 imagePublicId : result?.public_id
-	//             }
-	//         })
-
-	//         console.log(updatedUser);
-
-	//         // return result
-	//     }
-	// ).end(buffer)
 
 	const currentUser = await prisma.user.findUnique({
 		where: {
@@ -89,6 +64,135 @@ const uploadProfileImage = async (buffer: Buffer, userId: string) => {
 	return updatedUser;
 };
 
+
+const getMyProfile = async (payload: string,role:Role) => {
+  
+  const id  = payload;
+  if(role===Role.CUSTOMER){
+  const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        customerProfile: true, // Fetch related profile
+      },
+    });
+
+    if (!user) {
+	  throw new AppError(StatusCodes.NOT_FOUND,"Customer Profile not fond")
+    }
+  return user;
+  }else if(role===Role.TECHNICIAN){
+	const user = await prisma.user.findUnique({
+      where: { id },
+      select: {
+        id: true,
+        email: true,
+        role: true,
+        status: true,
+        customerProfile: {
+			select:{
+				id:true,
+				name:true,
+				phone:true,
+				address:true,
+				imageUrl:true,
+				imagePublicId:true
+			}
+		}
+      },
+    });
+
+    if (!user) {
+	  throw new AppError(StatusCodes.NOT_FOUND,"Technecian Profile not fond")
+    }
+
+  const { customerProfile, ...userData } = user;
+  return {
+    ...userData,
+    technicianProfile: customerProfile,
+  };
+  }
+  
+};
+
+const updateProfile = async (payload:IUserUpdate,id:string,role:Role) => {
+
+	if(role===Role.CUSTOMER){
+    const user = await prisma.customerProfile.update({
+      where: {userId: id },
+      data: payload,
+    });
+
+    if (!user) {
+	  throw new AppError(StatusCodes.NOT_FOUND,"User Profile not fond")
+    }
+	return user;
+	}else if(role===Role.TECHNICIAN){
+    const user = await prisma.customerProfile.update({
+      where: {userId: id },
+	  select:{
+				id:true,
+				name:true,
+				phone:true,
+				address:true,
+				imageUrl:true,
+				imagePublicId:true
+	  },
+      data: payload,
+    });
+
+    if (!user) {
+	  throw new AppError(StatusCodes.NOT_FOUND,"User Profile not fond")
+    }
+	return user;
+	}
+  
+};
+
+const updateMeter = async (payload:IUpdateMeterPayload,id:string) => {
+
+	const profile = await prisma.customerProfile.findUnique({
+    where: {
+      userId: id,
+    },
+    select: {
+      meterNo: true,
+    },
+  });
+
+  if (!profile) {
+    throw new AppError(
+      StatusCodes.NOT_FOUND,
+      "Customer profile not found",
+    );
+  }
+
+  if (profile.meterNo) {
+    throw new AppError(
+      StatusCodes.BAD_REQUEST,
+      "Meter number has already been set and cannot be changed",
+    );
+  }
+
+    const user = await prisma.customerProfile.update({
+      where: {userId: id },
+      data: payload
+    });
+
+    if (!user) {
+	  throw new AppError(StatusCodes.NOT_FOUND,"User Profile not fond")
+    }
+	return user;
+	
+  
+};
+
 export const UserServices = {
 	uploadProfileImage,
+	updateProfile,
+	getMyProfile,
+	updateMeter
 };
