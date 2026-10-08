@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { adminRoutes } from "../module/admin/admin.route";
+import { AreaRoutes } from "../module/area/area.route";
 import { authRoutes } from "../module/auth/auth.route";
 import { FeederRoutes } from "../module/feeder/feeder.route";
 import { SubstationRoutes } from "../module/substation/substation.route";
