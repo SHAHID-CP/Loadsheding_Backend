@@ -1,9 +1,7 @@
 import { StatusCodes } from "http-status-codes";
-import { Role } from "../../../../generated/prisma/enums";
-import { cloudinary } from "../../lib/cloudinary";
+import type { Prisma } from "../../../../generated/prisma/client";
 import { prisma } from "../../lib/prisma";
 import { AppError } from "../../utils/sendResponse";
-import type { Prisma } from "../../../../generated/prisma/client";
 
 
 const publicUserSelect = {

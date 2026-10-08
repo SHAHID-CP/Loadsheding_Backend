@@ -39,11 +39,11 @@ const uploadProfileImage = catchAsync(async (req: Request, res: Response) => {
 
 	const userId = req.user?.id;
 
-	const result = await UserServices.uploadProfileImage(
+	const imageUrl = await UserServices.uploadProfileImage(
 		req.file?.buffer,
 		userId!,
 	);
-    sendSuccess(res, StatusCodes.OK, "profile picture uploded successful", null );
+    sendSuccess(res, StatusCodes.OK, "profile picture uploded successful", imageUrl );
 });
 
 export const UserController = {

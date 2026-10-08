@@ -14,11 +14,8 @@ router.get('/me',auth(Role.CUSTOMER, Role.TECHNICIAN), UserController.getMyProfi
 router.patch('/update', validate(updateCustomerProfileSchema),auth(Role.CUSTOMER, Role.TECHNICIAN), UserController.updateProfile);
 
 router.patch('/meter-update',validate(updateMeterSchema),auth(Role.CUSTOMER), UserController.updateMeter);
-// router.patch(
-// 	"/profile-image",
-// 	auth(Role.ADMIN, Role.CUSTOMER, Role.TECHNICIAN),
-// 	upload.single("profileImage"),
-// 	UserController.uploadProfileImage,
-// );
+router.patch("/profile-image",auth( Role.CUSTOMER, Role.TECHNICIAN),
+	        upload.single("profileImage"),UserController.uploadProfileImage,
+);
 
 export const userRoutes = router;

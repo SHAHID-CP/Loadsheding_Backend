@@ -1,8 +1,8 @@
 import type { NextFunction, Request, Response } from "express";
 import { StatusCodes } from "http-status-codes";
 import { catchAsync } from "../../utils/catchAsync";
-import { AdminServices } from "./admin.service";
 import { sendSuccess } from "../../utils/sendResponse";
+import { AdminServices } from "./admin.service";
 
 
 

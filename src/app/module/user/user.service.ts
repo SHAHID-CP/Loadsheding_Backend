@@ -8,15 +8,19 @@ import type { IUpdateMeterPayload, IUserUpdate } from "./user.interface";
 
 const uploadProfileImage = async (buffer: Buffer, userId: string) => {
 
-	const currentUser = await prisma.user.findUnique({
-		where: {
-			id: userId,
-		},
-		select: {
-			imagePublicId: true,
-			imageUrl: true,
-		},
-	});
+const currentUser = await prisma.user.findUnique({
+  where: {
+    id: userId,
+  },
+  include: {
+    customerProfile: {
+      select: {
+        imagePublicId: true,
+        imageUrl: true,
+      },
+    },
+  },
+});
 
 	const cloudinaryResult = await new Promise<UploadApiResponse>(
 		(resolve, reject) => {
@@ -42,23 +46,22 @@ const uploadProfileImage = async (buffer: Buffer, userId: string) => {
 		},
 	);
 
-	const updatedUser = await prisma.user.update({
+	const updatedUser = await prisma.customerProfile.update({
 		where: {
-			id: userId,
+			userId,
 		},
 
 		data: {
 			imageUrl: cloudinaryResult.secure_url,
 			imagePublicId: cloudinaryResult.public_id,
-		},
-
-		omit: {
-			password: true,
-		},
+		},  
+		select: {
+                imageUrl: true,
+        },
 	});
 
-	if (currentUser?.imagePublicId && currentUser.imageUrl) {
-		await cloudinary.uploader.destroy(currentUser.imagePublicId);
+	if (currentUser?.customerProfile?.imagePublicId && currentUser.customerProfile.imageUrl) {
+		await cloudinary.uploader.destroy(currentUser.customerProfile.imagePublicId);
 	}
 
 	return updatedUser;
